@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto-js');
 const User = require('../models/user_model');
 
 
@@ -7,18 +8,19 @@ exports.signup = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then(hash => {
       const user = new User({
-        email: req.body.email,
+        email: crypto.SHA256(req.body.email),
         password: hash
       });
+      console.log(user);
       user.save()
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ message: 'Email déjà utilisé !' + error }));
     })
     .catch(error => res.status(500).json({ error }));
 };
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  User.findOne({ email: crypto.SHA256(req.body.email).toString(crypto.enc.Hex) }) // toString pour convertir le tableau renvoyé par crypto en string
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
@@ -37,8 +39,9 @@ exports.login = (req, res, next) => {
             )
           });
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(600).json({ error }));
     })
     .catch(error => res.status(500).json({ error }));
+
 };
 
