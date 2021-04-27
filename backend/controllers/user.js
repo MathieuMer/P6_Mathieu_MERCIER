@@ -11,10 +11,9 @@ exports.signup = (req, res, next) => {
         email: crypto.SHA256(req.body.email),
         password: hash
       });
-      console.log(user);
       user.save()
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ message: 'Email déjà utilisé !' + error }));
+        .catch(error => res.status(400).json({ message: 'L\'utilisateur n\'a pas pu être créé :' + error }));
     })
     .catch(error => res.status(500).json({ error }));
 };
