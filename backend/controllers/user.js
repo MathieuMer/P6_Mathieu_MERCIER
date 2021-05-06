@@ -15,7 +15,7 @@ exports.signup = (req, res, next) => {
         .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
         .catch(error => res.status(400).json({ message: 'L\'utilisateur n\'a pas pu être créé :' + error }));
     })
-    .catch(error => res.status(500).json({ error }));
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.login = (req, res, next) => {
@@ -33,7 +33,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign( // Fonction d'encodage d'un nouveau token
               { userId: user._id },
-              'RANDOM_TOKEN_SECRET',
+              process.env.TOKEN_KEY,
               { expiresIn: '24h' }
             )
           });
